@@ -1,0 +1,14 @@
+---
+- hosts: appdbs
+  gather_facts: false # remove later! speeds up testing
+  become: true
+  tasks:
+    - name: configure yum repo
+      include_role:
+        name: common
+
+    - name: install postgresql db
+      include_role:
+        name: geerlingguy.postgresql    
+
+    
