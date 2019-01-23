@@ -1,5 +1,5 @@
 ---
-- hosts: appdbs
+- hosts: apps
   gather_facts: false # remove later! speeds up testing
   become: true
   tasks:
@@ -11,6 +11,8 @@
       package:
         name: tomcat
         state: latest
+      notify:
+        - restart tomcat
 
     - name: create tomcat directory
       file:
@@ -18,21 +20,21 @@
         state: directory
       with_items:
         - ROOT
-        - ansible
 
-    - name: copy static index.html to tomcat webapps/ansible/index.html
+    - name: copy static index.html to tomcat webapps/ROOT/index.html
       template:
         src: "templates/{{ item.src }}"
-        dest: "/usr/share/tomcat/webapps/ROOT/index.html"
+        dest: "/usr/share/tomcat/webapps/{{ item.folder }}/index.html"
         mode: 0644
       with_items:
-        - {src: 'index.html.j2', groups: 'ROOT' }
+        - {src: 'index.html.j2', folder: 'ROOT' }
     
-    - name: start and enable tomcat
+  handlers:
+    - name: restart tomcat
       service:
         name: tomcat
         enabled: yes
-        state: started
+        state: restarted
 
 
   
